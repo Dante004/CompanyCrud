@@ -32,6 +32,20 @@ namespace CompanyCrud.Controllers
             return CreatedAtAction(nameof(Create), result.Value);
         }
 
+        [HttpPut("/{id}")]
+        public async Task<IActionResult> Update(long id,[FromBody] Company company, CancellationToken token = default)
+        {
+            var result = await _logic.UpdateCompany(company, token);
+
+            if (!result.Success)
+            {
+                result.AddErrorToModelState(ModelState);
+                return BadRequest(ModelState);
+            }
+
+            return NoContent();
+        }
+
         [HttpDelete("/{id}")]
         public async Task<IActionResult> Delete(long id, CancellationToken token = default)
         {
