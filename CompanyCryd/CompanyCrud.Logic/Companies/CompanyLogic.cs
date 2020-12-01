@@ -2,6 +2,9 @@
 using CompanyCrud.Models;
 using CompanyCrud.Models.DataContext;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,6 +64,15 @@ namespace CompanyCrud.Logic.Companies
             }
 
             return Result.Ok(company);
+        }
+
+        public async Task<Result<List<Company>>> Search(string keyword, DateTime From, DateTime To, JobTitle jobTitle)
+        {
+            return Result.Ok(await _dataContext.Companies
+                .Where(x => x.Name.Contains(keyword))
+                .Include(x => x.Employes
+                    .Where(x => x.DateOfBirth >= From && x.DateOfBirth <= To && x.JobTitle == jobTitle))
+                .ToListAsync());
         }
     }
 }

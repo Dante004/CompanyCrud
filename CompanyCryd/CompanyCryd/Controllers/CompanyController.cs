@@ -1,4 +1,5 @@
-﻿using CompanyCrud.Logic;
+﻿using CompanyCrud.Dto;
+using CompanyCrud.Logic;
 using CompanyCrud.Logic.Interfaces;
 using CompanyCrud.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace CompanyCrud.Controllers
             _logic = logic;
         }
 
-        [HttpPost]
+        [HttpPost("/company/create")]
         public async Task<IActionResult> Create(Company company, CancellationToken token = default)
         {
             var result = await _logic.AddCompany(company, token);
@@ -32,10 +33,13 @@ namespace CompanyCrud.Controllers
             return CreatedAtAction(nameof(Create), result.Value);
         }
 
-        [HttpPut("/{id}")]
-        public async Task<IActionResult> Update(long id,[FromBody] Company company, CancellationToken token = default)
+        [HttpPost("company/search")]
+        public async Task<IActionResult> Search(SearchDto searchDto)
         {
-            var result = await _logic.UpdateCompany(company, token);
+            var result = await _logic.Search(searchDto.Keyword,
+                searchDto.EmployeeDateOfBirthFrom,
+                searchDto.EmployeeDateOfBirthTo,
+                searchDto.EmployeeJobTitles);
 
             if (!result.Success)
             {
@@ -43,10 +47,26 @@ namespace CompanyCrud.Controllers
                 return BadRequest(ModelState);
             }
 
+            return Ok(result.Value);
+        }
+
+        [HttpPut("company/update/{id}")]
+        public async Task<IActionResult> Update(long id,[FromBody] Company company, CancellationToken token = default)
+        {
+            var result = await _logic.GetCompany(id, token);
+
+            if (!result.Success)
+            {
+                result.AddErrorToModelState(ModelState);
+                return BadRequest(ModelState);
+            }
+
+            //mapowanie
+
             return NoContent();
         }
 
-        [HttpDelete("/{id}")]
+        [HttpDelete("company/delete/{id}")]
         public async Task<IActionResult> Delete(long id, CancellationToken token = default)
         {
             var result = await _logic.DeleteCompany(id, token);
