@@ -24,7 +24,7 @@ namespace CompanyCrud.Logic.Companies
             }
 
             await _dataContext.Companies.AddAsync(company, token);
-            await _dataContext.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync(token);
 
             return Result.Ok(company.ID);
         }
@@ -34,7 +34,7 @@ namespace CompanyCrud.Logic.Companies
             var company = await _dataContext
                 .Companies
                 .Include(x => x.Employes)
-                .FirstOrDefaultAsync(x => x.ID == id);
+                .FirstOrDefaultAsync(x => x.ID == id, token);
 
             if(company == null)
             {
@@ -43,7 +43,7 @@ namespace CompanyCrud.Logic.Companies
 
             _dataContext.Employees.RemoveRange(company.Employes);
             _dataContext.Companies.Remove(company);
-            await _dataContext.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync(token);
 
             return Result.Ok(id);
         }
