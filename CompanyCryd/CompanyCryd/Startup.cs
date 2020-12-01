@@ -1,3 +1,5 @@
+using CompanyCrud.Logic.Companies;
+using CompanyCrud.Logic.Interfaces;
 using CompanyCrud.Models.DataContext;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +33,8 @@ namespace CompanyCryd
             services.AddDbContext<DataContext>(options => options
             .UseSqlServer(Configuration
                 .GetConnectionString("Default")));
+
+            services.AddScoped<ICompanyLogic, CompanyLogic>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
