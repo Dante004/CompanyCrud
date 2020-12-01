@@ -47,5 +47,20 @@ namespace CompanyCrud.Logic.Companies
 
             return Result.Ok(id);
         }
+
+        public async Task<Result<Company>> GetCompany(long id, CancellationToken token)
+        {
+            var company = await _dataContext
+                .Companies
+                .Include(x => x.Employes)
+                .FirstOrDefaultAsync(x => x.ID == id, token);
+
+            if (company == null)
+            {
+                return Result.Error<Company>("Company with that id doesn't exist");
+            }
+
+            return Result.Ok(company);
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace CompanyCrud.Logic.Interfaces
     {
         Task<Result<long>> AddCompany(Company company, CancellationToken token);
         Task<Result<long>> DeleteCompany(long id, CancellationToken token);
+        Task<Result<Company>> GetCompany(long id, CancellationToken token);
     }
 }
