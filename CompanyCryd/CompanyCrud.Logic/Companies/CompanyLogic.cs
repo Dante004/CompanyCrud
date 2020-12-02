@@ -77,13 +77,18 @@ namespace CompanyCrud.Logic.Companies
             return Result.Ok(company);
         }
 
-        public async Task<Result<List<Company>>> Search(string keyword, DateTime From, DateTime To, JobTitle jobTitle)
+        public async Task<Result<List<Company>>> Search(string keyword, DateTime DateOfBirthFrom, DateTime DateOfBirthTo, JobTitle jobTitle)
         {
-            return Result.Ok(await _dataContext.Companies
-                .Where(x => x.Name.Contains(keyword))
-                .Include(x => x.Employes
-                    .Where(x => x.DateOfBirth >= From && x.DateOfBirth <= To && x.JobTitle == jobTitle))
-                .ToListAsync());
+            IQueryable<Company> query = _dataContext.Companies;
+            if (DateOfBirthFrom != default && DateOfBirthTo != default)
+                query = query.Include(x => x.Employes
+                           .Where(x => x.DateOfBirth >= DateOfBirthFrom && x.DateOfBirth <= DateOfBirthTo && x.JobTitle == jobTitle));
+            else
+                query = query.Include(x => x.Employes);
+
+            query = query.WhereIf(!string.IsNullOrEmpty(keyword), x => x.Name.Contains(keyword));
+
+            return Result.Ok(await query.ToListAsync());
         }
 
         public async Task<Result> UpdateCompany(Company company, CancellationToken token)
