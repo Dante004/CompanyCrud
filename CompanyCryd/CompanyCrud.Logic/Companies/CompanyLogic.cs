@@ -1,6 +1,7 @@
 ﻿using CompanyCrud.Logic.Interfaces;
 using CompanyCrud.Models;
 using CompanyCrud.Models.DataContext;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,13 @@ namespace CompanyCrud.Logic.Companies
     public class CompanyLogic : ICompanyLogic
     {
         private readonly DataContext _dataContext;
+        private readonly IValidator<Company> _validator;
 
-        public CompanyLogic(DataContext dataContext)
+        public CompanyLogic(DataContext dataContext,
+            IValidator<Company> validator)
         {
             _dataContext = dataContext;
+            _validator = validator;
         }
 
         public async Task<Result<long>> AddCompany(Company company, CancellationToken token)
@@ -24,6 +28,13 @@ namespace CompanyCrud.Logic.Companies
             if(company == null)
             {
                 return Result.Error<long>("Company cannot be null");
+            }
+
+            var validatorResult = await _validator.ValidateAsync(company);
+
+            if(!validatorResult.IsValid)
+            {
+                return Result.Error<long>(validatorResult.Errors);
             }
 
             await _dataContext.Companies.AddAsync(company, token);
@@ -73,6 +84,24 @@ namespace CompanyCrud.Logic.Companies
                 .Include(x => x.Employes
                     .Where(x => x.DateOfBirth >= From && x.DateOfBirth <= To && x.JobTitle == jobTitle))
                 .ToListAsync());
+        }
+
+        public async Task<Result> UpdateCompany(Company company, CancellationToken token)
+        {
+            if(company == null)
+            {
+                return Result.Error<Company>("Company cannot be null");
+            }
+
+            var validatorResult = await _validator.ValidateAsync(company);
+
+            if (!validatorResult.IsValid)
+            {
+                return Result.Error<Company>(validatorResult.Errors);
+            }
+
+            await _dataContext.SaveChangesAsync(token);
+            return Result.Ok();
         }
     }
 }
