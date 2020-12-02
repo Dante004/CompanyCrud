@@ -9,6 +9,12 @@ namespace CompanyCrud.Logic.Validators
         {
             RuleFor(x => x.ID)
                 .NotNull();
+            RuleFor(x => x.FirstName)
+                .NotEmpty()
+                .NotNull();
+            RuleFor(x => x.LastName)
+                .NotEmpty()
+                .NotNull();
             RuleFor(x => x.DateOfBirth)
                 .NotNull();
         }

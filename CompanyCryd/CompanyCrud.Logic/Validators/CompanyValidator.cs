@@ -12,7 +12,7 @@ namespace CompanyCrud.Logic.Validators
             RuleFor(x => x.Name)
                 .NotEmpty();
             RuleFor(x => x.Establishment)
-                .InclusiveBetween(0, 60);
+                .InclusiveBetween(0, 2000);
         }
     }
 }
