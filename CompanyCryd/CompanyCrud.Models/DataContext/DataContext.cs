@@ -7,7 +7,7 @@ namespace CompanyCrud.Models.DataContext
         public DataContext(DbContextOptions options) :
             base(options)
         {
-
+            Database.Migrate();
         }
 
         public DbSet<Company> Companies { get; set; }
