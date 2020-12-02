@@ -12,6 +12,6 @@ namespace CompanyCrud.Logic.Interfaces
         Task<Result<long>> DeleteCompany(long id, CancellationToken token);
         Task<Result<Company>> GetCompany(long id, CancellationToken token);
         Task<Result> UpdateCompany(Company company, CancellationToken token);
-        Task<Result<List<Company>>> Search(string keyword, DateTime From, DateTime To, JobTitle jobTitle);
+        Task<Result<List<Company>>> Search(string keyword, DateTime From, DateTime To, JobTitle jobTitle, CancellationToken token);
     }
 }

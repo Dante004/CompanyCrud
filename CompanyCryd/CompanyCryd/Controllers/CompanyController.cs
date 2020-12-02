@@ -4,10 +4,7 @@ using CompanyCrud.Logic;
 using CompanyCrud.Logic.Interfaces;
 using CompanyCrud.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,12 +46,13 @@ namespace CompanyCrud.Controllers
         }
 
         [HttpPost("company/search")]
-        public async Task<IActionResult> Search(SearchDto searchDto)
+        public async Task<IActionResult> Search(SearchDto searchDto, CancellationToken token = default)
         {
             var result = await _logic.Search(searchDto.Keyword,
                 searchDto.EmployeeDateOfBirthFrom,
                 searchDto.EmployeeDateOfBirthTo,
-                searchDto.EmployeeJobTitles);
+                searchDto.EmployeeJobTitles,
+                token);
 
             if (!result.Success)
             {

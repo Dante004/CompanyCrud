@@ -77,7 +77,7 @@ namespace CompanyCrud.Logic.Companies
             return Result.Ok(company);
         }
 
-        public async Task<Result<List<Company>>> Search(string keyword, DateTime DateOfBirthFrom, DateTime DateOfBirthTo, JobTitle jobTitle)
+        public async Task<Result<List<Company>>> Search(string keyword, DateTime DateOfBirthFrom, DateTime DateOfBirthTo, JobTitle jobTitle, CancellationToken token)
         {
             IQueryable<Company> query = _dataContext.Companies;
             if (DateOfBirthFrom != default && DateOfBirthTo != default)
@@ -88,7 +88,7 @@ namespace CompanyCrud.Logic.Companies
 
             query = query.WhereIf(!string.IsNullOrEmpty(keyword), x => x.Name.Contains(keyword));
 
-            return Result.Ok(await query.ToListAsync());
+            return Result.Ok(await query.ToListAsync(token));
         }
 
         public async Task<Result> UpdateCompany(Company company, CancellationToken token)
