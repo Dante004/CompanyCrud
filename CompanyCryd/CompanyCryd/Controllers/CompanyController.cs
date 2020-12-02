@@ -6,6 +6,7 @@ using CompanyCrud.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,8 +28,10 @@ namespace CompanyCrud.Controllers
         }
 
         [HttpPost("/company/create")]
-        public async Task<IActionResult> Create(Company company, CancellationToken token = default)
+        public async Task<IActionResult> Create(CompanyDto companyDto, CancellationToken token = default)
         {
+            var company = _mapper.Map<Company>(companyDto);
+
             var result = await _logic.AddCompany(company, token);
 
             if(!result.Success)
@@ -37,7 +40,12 @@ namespace CompanyCrud.Controllers
                 return BadRequest(ModelState);
             }
 
-            return CreatedAtAction(nameof(Create), result.Value);
+            var createResult = new CreateResult
+            {
+                Id = result.Value
+            };
+
+            return CreatedAtAction(nameof(Create), createResult);
         }
 
         [HttpPost("company/search")]
@@ -54,7 +62,12 @@ namespace CompanyCrud.Controllers
                 return BadRequest(ModelState);
             }
 
-            return Ok(result.Value);
+            var searchResult = new SearchResult
+            {
+                Results = _mapper.Map<List<CompanyDto>>(result.Value)
+            };
+
+            return Ok(searchResult);
         }
 
         [HttpPut("company/update/{id}")]
