@@ -1,4 +1,5 @@
-﻿using CompanyCrud.Dto;
+﻿using AutoMapper;
+using CompanyCrud.Dto;
 using CompanyCrud.Logic;
 using CompanyCrud.Logic.Interfaces;
 using CompanyCrud.Models;
@@ -13,10 +14,13 @@ namespace CompanyCrud.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyLogic _logic;
+        private readonly IMapper _mapper;
 
-        public CompanyController(ICompanyLogic logic)
+        public CompanyController(ICompanyLogic logic,
+            IMapper mapper)
         {
             _logic = logic;
+            _mapper = mapper;
         }
 
         [HttpPost("/company/create")]
@@ -51,7 +55,7 @@ namespace CompanyCrud.Controllers
         }
 
         [HttpPut("company/update/{id}")]
-        public async Task<IActionResult> Update(long id,[FromBody] Company company, CancellationToken token = default)
+        public async Task<IActionResult> Update(long id,[FromBody] CompanyDto companyDto, CancellationToken token = default)
         {
             var result = await _logic.GetCompany(id, token);
 
@@ -61,7 +65,15 @@ namespace CompanyCrud.Controllers
                 return BadRequest(ModelState);
             }
 
-            //mapowanie
+            var updatedComapny = _mapper.Map(companyDto, result.Value);
+
+            var updatedResult = await _logic.UpdateCompany(updatedComapny, token);
+
+            if (!updatedResult.Success)
+            {
+                updatedResult.AddErrorToModelState(ModelState);
+                return BadRequest(ModelState);
+            }
 
             return NoContent();
         }
