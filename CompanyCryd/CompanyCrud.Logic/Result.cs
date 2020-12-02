@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using FluentValidation.Results;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CompanyCrud.Logic
 {
@@ -54,6 +56,22 @@ namespace CompanyCrud.Logic
                     }
                 }
             };
+        }
+
+        public static Result<T> Error<T>(IEnumerable<ValidationFailure> validationFailures)
+        {
+            var result = new Result<T>
+            {
+                Success = false,
+                Errors = validationFailures.Select(v => new ErrorMessage()
+                {
+                    PropertyName = v.PropertyName,
+                    Message = v.ErrorMessage
+                })
+            };
+
+
+            return result;
         }
     }
 

@@ -1,6 +1,8 @@
+using AutoMapper;
 using CompanyCrud.Logic.Companies;
 using CompanyCrud.Logic.Interfaces;
 using CompanyCrud.Models.DataContext;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -30,13 +32,19 @@ namespace CompanyCryd
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(Startup));
             services.AddDbContext<DataContext>(options => options
             .UseSqlServer(Configuration
                 .GetConnectionString("Default")));
 
             services.AddScoped<ICompanyLogic, CompanyLogic>();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(opt =>
+                {
+                    opt.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+                });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CompanyCryd", Version = "v1" });
